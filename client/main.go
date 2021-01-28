@@ -6,22 +6,33 @@ import (
 
 	messages "github.com/bkpeh/protobuf_poly/proto"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
-type msg1 struct {
-	evtname string
+var msg1 = &structpb.Struct{
+	Fields: map[string]*structpb.Value{
+		"subevtname": &structpb.Value{
+			Kind: &structpb.Value_StringValue{
+				StringValue: "E1",
+			},
+		},
+	},
 }
 
-func (m msg1) ProtoReflect() protoreflect.Message {
-	var a protoreflect.Message
-	return a
-}
-
-type msg2 struct {
-	evtname string
-	evtid   int
+var msg2 = &structpb.Struct{
+	Fields: map[string]*structpb.Value{
+		"subevtname": &structpb.Value{
+			Kind: &structpb.Value_StringValue{
+				StringValue: "E2",
+			},
+		},
+		"evtid": &structpb.Value{
+			Kind: &structpb.Value_StringValue{
+				StringValue: "22",
+			},
+		},
+	},
 }
 
 func main() {
@@ -34,20 +45,11 @@ func main() {
 
 	defer conn.Close()
 
-	newmsg1 := msg1{
-		evtname: "E1",
-	}
+	anym1, _ := anypb.New(msg1)
+	anym2, _ := anypb.New(msg2)
 
-	//any, _ := anypb.New(newmsg1)
-	fmt.Println("xxxxx")
-	//var anyarr []*anypb.Any
-	//msgdata, err := proto.Marshal(newmsg1)
-	any, err := anypb.New(newmsg1)
-	if err != nil {
-		fmt.Println("ANYPB:", err)
-	}
+	anyarr := []*anypb.Any{anym1, anym2}
 
-	anyarr := []*anypb.Any{any}
 	newevt := messages.Event{
 		Name:    "EVENT",
 		Details: anyarr,
@@ -56,5 +58,5 @@ func main() {
 	client := messages.NewGetSystemEventsClient(conn)
 	respond, err := client.GetEvent(context.Background(), &newevt)
 
-	fmt.Println("Respond.", respond.Id)
+	fmt.Println("Respond:", respond.Id)
 }
