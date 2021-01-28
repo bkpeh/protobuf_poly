@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package messages;
+
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/bkpeh/protobuf_poly/proto;messages";
+
+message Event {
+    string name = 1;
+    repeated google.protobuf.Any details = 2;
+}
+
+message Pid {
+    int32 id = 1;
+}
+
+service GetSystemEvents {
+    rpc GetEvent(Event) returns (Pid) {}
+}
