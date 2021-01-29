@@ -7,11 +7,20 @@ import (
 
 	messages "github.com/bkpeh/protobuf_poly/proto"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 type server struct {
 	messages.UnimplementedGetSystemEventsServer
+}
+
+type evtmsg struct {
+	evt string
+}
+
+func (x evtmsg) ProtoReflect() protoreflect.Message {
+	var a protoreflect.Message
+	return a
 }
 
 func (s server) GetEvent(ctx context.Context, e *messages.Event) (*messages.Pid, error) {
@@ -19,12 +28,11 @@ func (s server) GetEvent(ctx context.Context, e *messages.Event) (*messages.Pid,
 
 	for _, v := range e.Details {
 		fmt.Println("==============")
-		m := &structpb.Struct{}
-		v.UnmarshalTo(m)
+		var m evtmsg
 
-		for ii, vv := range m.Fields {
-			fmt.Println(ii, ":", vv)
-		}
+		v.UnmarshalTo(m)
+		fmt.Println("EVT:", m.evt)
+
 	}
 
 	return &messages.Pid{Id: 1}, nil

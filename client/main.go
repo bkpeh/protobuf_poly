@@ -6,10 +6,11 @@ import (
 
 	messages "github.com/bkpeh/protobuf_poly/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
+/*
 var msg1 = &structpb.Struct{
 	Fields: map[string]*structpb.Value{
 		"subevtname": &structpb.Value{
@@ -34,6 +35,14 @@ var msg2 = &structpb.Struct{
 		},
 	},
 }
+*/
+type newmsg struct {
+	evtname string
+}
+
+func (x newmsg) ProtoReflect() protoreflect.Message {
+	return
+}
 
 func main() {
 
@@ -45,10 +54,15 @@ func main() {
 
 	defer conn.Close()
 
-	anym1, _ := anypb.New(msg1)
-	anym2, _ := anypb.New(msg2)
+	var n newmsg
+	anym1, _ := anypb.New(n)
 
-	anyarr := []*anypb.Any{anym1, anym2}
+	/*
+		anym1, _ := anypb.New(msg1)
+		anym2, _ := anypb.New(msg2)
+		anym3, _ := anypb.New(msg3)
+	*/
+	anyarr := []*anypb.Any{anym1}
 
 	newevt := messages.Event{
 		Name:    "EVENT",
