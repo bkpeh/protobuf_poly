@@ -7,20 +7,10 @@ import (
 
 	messages "github.com/bkpeh/protobuf_poly/proto"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 type server struct {
 	messages.UnimplementedGetSystemEventsServer
-}
-
-type evtmsg struct {
-	evt string
-}
-
-func (x evtmsg) ProtoReflect() protoreflect.Message {
-	var a protoreflect.Message
-	return a
 }
 
 func (s server) GetEvent(ctx context.Context, e *messages.Event) (*messages.Pid, error) {
@@ -28,11 +18,29 @@ func (s server) GetEvent(ctx context.Context, e *messages.Event) (*messages.Pid,
 
 	for _, v := range e.Details {
 		fmt.Println("==============")
-		var m evtmsg
 
-		v.UnmarshalTo(m)
-		fmt.Println("EVT:", m.evt)
+		if v.MessageIs(&messages.EventMsg1{}) {
+			msg := new(messages.EventMsg1)
 
+			if err := v.UnmarshalTo(msg); err != nil {
+				fmt.Println(v.MessageName(), err)
+			}
+
+			fmt.Println(v.MessageName())
+			fmt.Println(msg.GetName())
+			fmt.Println(msg.GetId())
+		}
+		if v.MessageIs(&messages.EventMsg2{}) {
+			msg := new(messages.EventMsg2)
+
+			if err := v.UnmarshalTo(msg); err != nil {
+				fmt.Println(v.MessageName(), err)
+			}
+
+			fmt.Println(v.MessageName())
+			fmt.Println(msg.GetName())
+			fmt.Println(msg.GetText())
+		}
 	}
 
 	return &messages.Pid{Id: 1}, nil

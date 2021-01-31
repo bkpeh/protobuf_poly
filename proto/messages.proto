@@ -15,6 +15,16 @@ message Pid {
     int32 id = 1;
 }
 
+message EventMsg1 {
+    string name = 1;
+    int32 id = 2;
+}
+
+message EventMsg2 {
+    string name = 1;
+    string text = 2;
+}
+
 service GetSystemEvents {
     rpc GetEvent(Event) returns (Pid) {}
 }

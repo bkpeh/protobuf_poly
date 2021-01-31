@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	messages "github.com/bkpeh/protobuf_poly/proto"
+	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -36,13 +36,6 @@ var msg2 = &structpb.Struct{
 	},
 }
 */
-type newmsg struct {
-	evtname string
-}
-
-func (x newmsg) ProtoReflect() protoreflect.Message {
-	return
-}
 
 func main() {
 
@@ -54,15 +47,27 @@ func main() {
 
 	defer conn.Close()
 
-	var n newmsg
-	anym1, _ := anypb.New(n)
+	m1 := &messages.EventMsg1{
+		Name: "EventMsg1",
+		Id:   1,
+	}
+
+	m2 := &messages.EventMsg2{
+		Name: "EventMsg2",
+		Text: "This is an Event",
+	}
+
+	anym1, _ := ptypes.MarshalAny(m1)
+	anym2, _ := ptypes.MarshalAny(m2)
+
+	//anym1, _ := anypb.New(m1)
 
 	/*
 		anym1, _ := anypb.New(msg1)
 		anym2, _ := anypb.New(msg2)
 		anym3, _ := anypb.New(msg3)
 	*/
-	anyarr := []*anypb.Any{anym1}
+	anyarr := []*anypb.Any{anym1, anym2}
 
 	newevt := messages.Event{
 		Name:    "EVENT",
